@@ -33,8 +33,8 @@ jobs:
             ${{ steps.go-env.outputs.modcache }}
 
       - run: go version
-      - run: go test $(go work edit -json | jq -c -r '[.Use[].DiskPath | select(. != "gomod")] | map_values("./" + . + "/...")[]')
-      - run: go test -race -cover -coverprofile=coverage.txt $(go work edit -json | jq -c -r '[.Use[].DiskPath | select(. != "gomod")] | map_values("./" + . + "/...")[]')
+      - run: go test ./...
+      - run: go test -race -cover -coverprofile=coverage.txt ./...
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
