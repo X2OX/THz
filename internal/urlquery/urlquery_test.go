@@ -22,8 +22,11 @@ type KasA struct {
 }
 
 func TestUnmarshal(t *testing.T) {
-	k := &KasA{}
-	v := url.Values{}
+	var (
+		asd any
+		k   = &KasA{}
+		v   = url.Values{}
+	)
 	v.Set("a", "asdasd")
 	v.Add("arr", "1")
 	v.Add("arr", "2")
@@ -37,7 +40,6 @@ func TestUnmarshal(t *testing.T) {
 	v.Add("ba", "bbb")
 	v.Add("ba", "bbbb")
 
-	var asd any
 	asd = k
 
 	if err := Parse(v, asd); err != nil {
