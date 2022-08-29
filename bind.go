@@ -76,13 +76,10 @@ func (_BindForm) Bind(c *Context, a any) error {
 }
 
 func (_BindURLQuery) Bind(c *Context, a any) error {
-	u, err := url.Parse(pyrokinesis.Bytes.ToString(c.fc.Request.Header.RequestURI()))
-	if err != nil {
-		return err
-	}
+	u := pyrokinesis.Bytes.ToString(c.fc.URI().QueryString())
 
-	var val url.Values
-	if val, err = url.ParseQuery(u.RawQuery); err != nil {
+	val, err := url.ParseQuery(u)
+	if err != nil {
 		return err
 	}
 
