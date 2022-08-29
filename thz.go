@@ -57,7 +57,7 @@ func New() *THz {
 func (thz *THz) SetTrustedProxies(ip ...string) error {
 	arr := make([]*net.IPNet, 0, len(ip))
 	for _, v := range ip {
-		if strings.Contains(v, "/") {
+		if !strings.Contains(v, "/") {
 			_ip := net.ParseIP(v)
 
 			switch len(_ip) {
