@@ -2,6 +2,8 @@ package THz
 
 import (
 	"math"
+	"sync"
+	"time"
 
 	"github.com/valyala/fasthttp"
 	"go.x2ox.com/THz/render"
@@ -14,6 +16,9 @@ type Handler httprouter.Handler[Context]
 type Context struct {
 	fc  *fasthttp.RequestCtx
 	thz *THz
+
+	mux  sync.RWMutex
+	keys map[any]any
 
 	params   httprouter.Params
 	handlers httprouter.Handlers[Context]
@@ -59,6 +64,34 @@ func (c *Context) BindURLQuery(data any) error { return _BindAll{}.Bind(c, data)
 
 func (c *Context) RemoteIP() string    { return c.getRemoteIPs(false)[0] }
 func (c *Context) RemoteIPs() []string { return c.getRemoteIPs(false) }
+
+func (c *Context) Deadline() (deadline time.Time, ok bool) {
+	if c == nil || c.fc == nil {
+		return
+	}
+	return c.fc.Deadline()
+}
+func (c *Context) Done() <-chan struct{} {
+	if c == nil || c.fc == nil {
+		return nil
+	}
+	return c.fc.Done()
+}
+func (c *Context) Err() error {
+	if c == nil || c.fc == nil {
+		return nil
+	}
+	return c.fc.Err()
+}
+func (c *Context) Value(key any) any {
+	if c == nil || c.fc == nil {
+		return nil
+	}
+	if val, exists := c.Get(key); exists {
+		return val
+	}
+	return c.fc.Value(key)
+}
 
 func (c *Context) getRemoteIPs(abort bool) []string {
 	var (
