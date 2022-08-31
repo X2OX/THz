@@ -14,8 +14,9 @@ import (
 type THz struct {
 	httprouter.IRouter[Context]
 
-	srv   *fasthttp.Server
-	route *httprouter.Router[Context]
+	srv       *fasthttp.Server
+	route     *httprouter.Router[Context]
+	intercept httprouter.Handlers[Context]
 
 	trustedProxies []*net.IPNet
 	trustedHeaders []string
@@ -37,11 +38,14 @@ func New() *THz {
 		ctx := t.ctxPool.Get().(*Context)
 		ctx.fc = c
 		ctx.index = -1
+		ctx.handlers = append(ctx.handlers, t.intercept...)
 
 		method, uri := httprouter.NewMethod(pyrokinesis.Bytes.ToString(c.Method())),
 			pyrokinesis.Bytes.ToString(c.URI().Path())
 
-		ctx.handlers, ctx.params = t.route.Find(method, uri)
+		handlers, params := t.route.Find(method, uri)
+		ctx.handlers = append(ctx.handlers, handlers...)
+		ctx.params = params
 
 		ctx.Next()
 
@@ -91,4 +95,9 @@ func (thz *THz) SetTrustedProxies(ip ...string) error {
 // Remember, order determines priority
 func (thz *THz) SetTrustedHeaders(header ...string) {
 	thz.trustedHeaders = header
+}
+
+func (thz *THz) AddIntercept(intercept ...httprouter.Handler[Context]) {
+	// TODO check thz.route
+	thz.intercept = append(thz.intercept, intercept...)
 }
