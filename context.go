@@ -1,7 +1,6 @@
 package THz
 
 import (
-	"math"
 	"sync"
 	"time"
 
@@ -41,7 +40,7 @@ func (c *Context) SetLocation(v string) *Context    { return c.SetHeader("Locati
 func (c *Context) SetContentType(v string) *Context { return c.SetHeader("Content-Type", v) }
 
 func (c *Context) Status(code int) *Context { c.fc.Response.SetStatusCode(code); return c }
-func (c *Context) Abort() *Context          { c.index = math.MaxInt - 1; return c }
+func (c *Context) Abort() *Context          { c.index = len(c.handlers); return c }
 func (c *Context) Render(r render.Render) {
 	r.WriteContentType(c.fc)
 	if err := r.Render(c.fc); err != nil {
