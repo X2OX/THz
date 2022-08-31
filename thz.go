@@ -39,6 +39,7 @@ func New() *THz {
 		ctx.fc = c
 		ctx.index = -1
 		ctx.handlers = append(ctx.handlers, t.intercept...)
+		ctx.keys = make(map[any]any)
 
 		method, uri := httprouter.NewMethod(pyrokinesis.Bytes.ToString(c.Method())),
 			pyrokinesis.Bytes.ToString(c.URI().Path())
@@ -52,6 +53,7 @@ func New() *THz {
 		ctx.params = ctx.params[:0]
 		ctx.handlers = ctx.handlers[:0]
 		ctx.fc = nil
+		ctx.keys = nil
 		t.ctxPool.Put(ctx)
 	}
 
