@@ -16,7 +16,7 @@ type THz struct {
 
 	srv       *fasthttp.Server
 	route     *httprouter.Router[Context]
-	intercept httprouter.Handlers[Context]
+	intercept Handlers
 
 	trustedProxies []*net.IPNet
 	trustedHeaders []string
@@ -31,7 +31,7 @@ func New() *THz {
 		route:   r,
 	}
 	t.ctxPool = sync.Pool{New: func() any {
-		return &Context{thz: t, index: -1}
+		return &Context{thz: t, index: -1, handlers: t.intercept}
 	}}
 
 	t.srv.Handler = t.handle()
@@ -78,7 +78,7 @@ func (thz *THz) SetTrustedHeaders(header ...string) {
 	thz.trustedHeaders = header
 }
 
-func (thz *THz) AddIntercept(intercept ...httprouter.Handler[Context]) {
+func (thz *THz) AddIntercept(intercept ...Handler) {
 	// TODO check thz.route
 	thz.intercept = append(thz.intercept, intercept...)
 }
@@ -95,7 +95,9 @@ func (thz *THz) handle() func(c *fasthttp.RequestCtx) {
 			pyrokinesis.Bytes.ToString(c.URI().Path())
 
 		handlers, params := thz.route.Find(method, uri)
-		ctx.handlers = append(ctx.handlers, handlers...)
+		for _, v := range handlers {
+			ctx.handlers = append(ctx.handlers, Handler(v))
+		}
 		ctx.params = params
 
 		ctx.Next()

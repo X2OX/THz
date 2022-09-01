@@ -10,7 +10,10 @@ import (
 	"go.x2ox.com/sorbifolia/pyrokinesis"
 )
 
-type Handler httprouter.Handler[Context]
+type (
+	Handler  func(ctx *Context)
+	Handlers []Handler
+)
 
 type Context struct {
 	fc  *fasthttp.RequestCtx
@@ -20,7 +23,7 @@ type Context struct {
 	keys map[any]any
 
 	params   httprouter.Params
-	handlers httprouter.Handlers[Context]
+	handlers Handlers
 	index    int
 }
 
