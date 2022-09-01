@@ -1,18 +1,101 @@
 package cors
 
 import (
+	"strings"
+
 	"go.x2ox.com/THz"
+	"go.x2ox.com/sorbifolia/pyrokinesis"
+	"go.x2ox.com/sorbifolia/strong"
 )
+
+const (
+	headerAllowOrigin      = "Access-Control-Allow-Origin"
+	headerAllowCredentials = "Access-Control-Allow-Credentials"
+	headerAllowHeaders     = "Access-Control-Allow-Headers"
+	headerAllowMethods     = "Access-Control-Allow-Methods"
+	headerExposeHeaders    = "Access-Control-Expose-Headers"
+	headerMaxAge           = "Access-Control-Max-Age"
+
+	headerOrigin = "Origin"
+)
+
+func New(allowOrigin ...string) *Config { return &Config{AllowOrigins: allowOrigin} }
 
 // Config
 //
 // see: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#the_http_response_headers
 type Config struct {
-	Skip             func(*THz.Context) bool // Optional. Default return false
-	AllowOrigins     string                  // Optional. Default value "*"
-	AllowMethods     string                  // Optional. Default value "GET,POST,HEAD,PUT,DELETE,PATCH"
-	AllowHeaders     string                  // Optional. Default value "".
-	AllowCredentials bool                    // Optional. Default value false.
-	ExposeHeaders    string                  // Optional. Default value "".
-	MaxAge           int                     // Optional. Default value 0.
+	Skip             func(*THz.Context) bool
+	AllowOrigins     []string
+	AllowMethods     []string
+	AllowHeaders     []string
+	AllowCredentials bool
+	ExposeHeaders    []string
+	MaxAge           int
+}
+
+func (cfg *Config) Middleware() THz.Handler {
+	var (
+		allowOrigins     = "*"
+		allowMethods     = "GET,POST,HEAD,PUT,DELETE,PATCH"
+		allowHeaders     = "Origin,Content-Length,Content-Type,Authorization"
+		allowCredentials = "ture"
+		exposeHeaders    = ""
+	)
+	if len(cfg.AllowOrigins) != 0 {
+		allowOrigins = strings.Join(cfg.AllowOrigins, ",")
+	}
+	if len(cfg.AllowMethods) != 0 {
+		allowOrigins = strings.Join(cfg.AllowMethods, ",")
+	}
+	if len(cfg.AllowHeaders) != 0 {
+		allowHeaders = strings.Join(cfg.AllowHeaders, ",")
+	}
+	if len(cfg.ExposeHeaders) != 0 {
+		exposeHeaders = strings.Join(cfg.ExposeHeaders, ",")
+	}
+	maxAge := strong.Format(cfg.MaxAge)
+
+	return func(c *THz.Context) {
+		if cfg.Skip != nil && cfg.Skip(c) {
+			return
+		}
+
+		origin := "*"
+		if allowOrigins != "*" {
+			has := false
+			origin = pyrokinesis.Bytes.ToString(c.Request().Header.Peek(headerOrigin))
+			for _, v := range cfg.AllowOrigins {
+				if v == origin {
+					has = true
+					break
+				}
+			}
+			if !has {
+				c.SetHeader("Vary", "Origin")
+				return
+			}
+		}
+
+		if !c.Request().Header.IsOptions() {
+			return // is not CORS request
+		}
+
+		c.SetHeader("Vary", "Origin,Access-Control-Allow-Headers,Access-Control-Allow-Methods")
+
+		c.SetHeader(headerAllowOrigin, origin)
+		c.SetHeader(headerAllowMethods, allowMethods)
+		c.SetHeader(headerAllowHeaders, allowHeaders)
+		if cfg.AllowCredentials {
+			c.SetHeader(headerAllowCredentials, allowCredentials)
+		}
+		if cfg.MaxAge != 0 {
+			c.SetHeader(headerMaxAge, maxAge)
+		}
+		if exposeHeaders != "" {
+			c.SetHeader(headerExposeHeaders, exposeHeaders)
+		}
+
+		c.Status(204).Abort()
+	}
 }
