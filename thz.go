@@ -34,28 +34,7 @@ func New() *THz {
 		return &Context{thz: t, index: -1}
 	}}
 
-	t.srv.Handler = func(c *fasthttp.RequestCtx) {
-		ctx := t.ctxPool.Get().(*Context)
-		ctx.fc = c
-		ctx.index = -1
-		ctx.handlers = append(ctx.handlers, t.intercept...)
-		ctx.keys = make(map[any]any)
-
-		method, uri := httprouter.NewMethod(pyrokinesis.Bytes.ToString(c.Method())),
-			pyrokinesis.Bytes.ToString(c.URI().Path())
-
-		handlers, params := t.route.Find(method, uri)
-		ctx.handlers = append(ctx.handlers, handlers...)
-		ctx.params = params
-
-		ctx.Next()
-
-		ctx.params = ctx.params[:0]
-		ctx.handlers = ctx.handlers[:0]
-		ctx.fc = nil
-		ctx.keys = nil
-		t.ctxPool.Put(ctx)
-	}
+	t.srv.Handler = t.handle()
 
 	return t
 }
@@ -102,4 +81,29 @@ func (thz *THz) SetTrustedHeaders(header ...string) {
 func (thz *THz) AddIntercept(intercept ...httprouter.Handler[Context]) {
 	// TODO check thz.route
 	thz.intercept = append(thz.intercept, intercept...)
+}
+
+func (thz *THz) handle() func(c *fasthttp.RequestCtx) {
+	return func(c *fasthttp.RequestCtx) {
+		ctx := thz.ctxPool.Get().(*Context)
+		ctx.fc = c
+		ctx.index = -1
+		ctx.handlers = append(ctx.handlers, thz.intercept...)
+		ctx.keys = make(map[any]any)
+
+		method, uri := httprouter.NewMethod(pyrokinesis.Bytes.ToString(c.Method())),
+			pyrokinesis.Bytes.ToString(c.URI().Path())
+
+		handlers, params := thz.route.Find(method, uri)
+		ctx.handlers = append(ctx.handlers, handlers...)
+		ctx.params = params
+
+		ctx.Next()
+
+		ctx.params = ctx.params[:0]
+		ctx.handlers = ctx.handlers[:0]
+		ctx.fc = nil
+		ctx.keys = nil
+		thz.ctxPool.Put(ctx)
+	}
 }
