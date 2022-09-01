@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/valyala/fasthttp"
+	"go.uber.org/zap"
 	"go.x2ox.com/THz/render"
 	"go.x2ox.com/sorbifolia/httprouter"
 	"go.x2ox.com/sorbifolia/pyrokinesis"
@@ -119,4 +120,10 @@ func (c *Context) getRemoteIPs(abort bool) []string {
 	}
 
 	return append(arr, rIP.String())
+}
+
+func (c *Context) L() *zap.Logger {
+	return c.thz.log.With(
+		zap.String(string(c.fc.Method()), c.fc.URI().String()),
+	)
 }

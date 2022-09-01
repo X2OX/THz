@@ -2,11 +2,18 @@ package THz
 
 import (
 	"net"
+
+	"go.uber.org/zap"
 )
 
 func (thz *THz) init() *THz {
 	thz.route.Sort()
 	thz.IRouter = nil // not allowed updates routing
+
+	if thz.log == nil {
+		thz.log, _ = zap.NewProduction()
+	}
+
 	return thz
 }
 

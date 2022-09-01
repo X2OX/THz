@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/valyala/fasthttp"
+	"go.uber.org/zap"
 	"go.x2ox.com/sorbifolia/httprouter"
 	"go.x2ox.com/sorbifolia/pyrokinesis"
 )
@@ -21,6 +22,8 @@ type THz struct {
 	trustedProxies []*net.IPNet
 	trustedHeaders []string
 	ctxPool        sync.Pool
+
+	log *zap.Logger
 }
 
 func New() *THz {
@@ -82,6 +85,8 @@ func (thz *THz) AddIntercept(intercept ...Handler) {
 	// TODO check thz.route
 	thz.intercept = append(thz.intercept, intercept...)
 }
+
+func (thz *THz) SetLog(log *zap.Logger) { thz.log = log }
 
 func (thz *THz) handle() func(c *fasthttp.RequestCtx) {
 	return func(c *fasthttp.RequestCtx) {
