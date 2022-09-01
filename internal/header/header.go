@@ -4,6 +4,7 @@ import (
 	"errors"
 	"reflect"
 	"strconv"
+	"time"
 
 	"github.com/valyala/fasthttp"
 	"go.x2ox.com/sorbifolia/pyrokinesis"
@@ -108,6 +109,28 @@ func setValue(v reflect.Value, data string) error {
 	// case reflect.Slice:
 	case reflect.String:
 		v.SetString(data)
+	case reflect.Struct:
+		switch v.Type() {
+		case reflect.TypeOf(time.Time{}):
+			if tn, _ := strong.Parse[int64](data); tn != 0 {
+				v.Set(reflect.ValueOf(time.Unix(tn, 0)))
+				return nil
+			}
+
+			if t, err := time.Parse(time.RFC3339, data); err == nil {
+				v.Set(reflect.ValueOf(t))
+				return nil
+			}
+
+			if t, err := time.Parse(time.RFC1123, data); err == nil {
+				v.Set(reflect.ValueOf(t))
+				return nil
+			}
+
+			return errors.New("parse time error")
+		default:
+			return errors.New("unknown field type")
+		}
 	default:
 		return errors.New("unknown field type")
 	}

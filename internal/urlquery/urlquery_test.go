@@ -3,6 +3,7 @@ package urlquery
 import (
 	"net/url"
 	"testing"
+	"time"
 )
 
 type Kas struct {
@@ -17,6 +18,7 @@ type Bmm struct {
 }
 
 type KasA struct {
+	T time.Time `query:"t"`
 	Kas
 	Bmm
 }
@@ -27,6 +29,7 @@ func TestUnmarshal(t *testing.T) {
 		k   = &KasA{}
 		v   = url.Values{}
 	)
+	v.Set("t", time.Now().Format(time.RFC1123))
 	v.Set("a", "asdasd")
 	v.Add("arr", "1")
 	v.Add("arr", "2")

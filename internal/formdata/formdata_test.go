@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"mime/multipart"
 	"testing"
+	"time"
 )
 
 type SDA struct {
@@ -11,6 +12,7 @@ type SDA struct {
 	B string                  `form:"b"`
 	C string                  `form:"c"`
 	D []*multipart.FileHeader `form:"d"`
+	T *time.Time              `form:"t"`
 }
 
 func TestParse(t *testing.T) {
@@ -22,6 +24,7 @@ func TestParse(t *testing.T) {
 		_ = mw.WriteField("b", "123")
 		_ = mw.WriteField("c", "123")
 		_ = mw.WriteField("c", "123")
+		_ = mw.WriteField("t", time.Now().Format(time.RFC3339))
 
 		iw, _ := mw.CreateFormFile("d", "111.txt")
 		_, _ = iw.Write([]byte("123"))
