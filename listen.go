@@ -3,7 +3,7 @@ package THz
 import (
 	"net"
 
-	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 func (thz *THz) init() *THz {
@@ -11,7 +11,7 @@ func (thz *THz) init() *THz {
 	thz.IRouter = nil // not allowed updates routing
 
 	if thz.log == nil {
-		thz.log, _ = zap.NewProduction()
+		thz.SetZapLog(zapcore.DebugLevel)
 	}
 
 	return thz

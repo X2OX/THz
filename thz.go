@@ -86,8 +86,6 @@ func (thz *THz) AddIntercept(intercept ...Handler) {
 	thz.intercept = append(thz.intercept, intercept...)
 }
 
-func (thz *THz) SetLog(log *zap.Logger) { thz.log = log }
-
 func (thz *THz) handle() func(c *fasthttp.RequestCtx) {
 	return func(c *fasthttp.RequestCtx) {
 		ctx := thz.ctxPool.Get().(*Context)
