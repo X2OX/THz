@@ -78,6 +78,7 @@ func (cfg *Config) Middleware() THz.Handler {
 		}
 
 		if !c.Request().Header.IsOptions() {
+			c.SetHeader(headerAllowOrigin, origin)
 			return // is not CORS request
 		}
 
