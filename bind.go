@@ -36,9 +36,9 @@ func (_Bind) Bind(c *Context, a any) error {
 	case "application/json":
 		return _BindJSON{}.Bind(c, a)
 	case "application/x-www-form-urlencoded":
-		return _BindForm{}.Bind(c, a)
-	case "multipart/form-data":
 		return _BindPostForm{}.Bind(c, a)
+	case "multipart/form-data":
+		return _BindForm{}.Bind(c, a)
 	}
 
 	return errors.New("ContentType no support")

@@ -59,11 +59,11 @@ func (c *Context) Reader(data render.Reader)   { c.Render(data) }
 
 func (c *Context) Bind(data any) error         { return _Bind{}.Bind(c, data) }
 func (c *Context) BindAll(data any) error      { return _BindAll{}.Bind(c, data) }
-func (c *Context) BindForm(data any) error     { return _BindAll{}.Bind(c, data) }
-func (c *Context) BindPostForm(data any) error { return _BindAll{}.Bind(c, data) }
-func (c *Context) BindHeader(data any) error   { return _BindAll{}.Bind(c, data) }
-func (c *Context) BindJSON(data any) error     { return _BindAll{}.Bind(c, data) }
-func (c *Context) BindURLQuery(data any) error { return _BindAll{}.Bind(c, data) }
+func (c *Context) BindForm(data any) error     { return _BindForm{}.Bind(c, data) }
+func (c *Context) BindPostForm(data any) error { return _BindPostForm{}.Bind(c, data) }
+func (c *Context) BindHeader(data any) error   { return _BindHeader{}.Bind(c, data) }
+func (c *Context) BindJSON(data any) error     { return _BindJSON{}.Bind(c, data) }
+func (c *Context) BindURLQuery(data any) error { return _BindURLQuery{}.Bind(c, data) }
 
 func (c *Context) RemoteIP() string    { return c.getRemoteIPs(false)[0] }
 func (c *Context) RemoteIPs() []string { return c.getRemoteIPs(false) }
