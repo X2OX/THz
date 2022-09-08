@@ -97,11 +97,10 @@ func (thz *THz) handle() func(c *fasthttp.RequestCtx) {
 		method, uri := httprouter.NewMethod(pyrokinesis.Bytes.ToString(c.Method())),
 			pyrokinesis.Bytes.ToString(c.URI().Path())
 
-		handlers, params := thz.route.Find(method, uri)
+		handlers := thz.route.Find(method, uri, &ctx.params)
 		for _, v := range handlers {
 			ctx.handlers = append(ctx.handlers, Handler(v))
 		}
-		ctx.params = params
 
 		ctx.Next()
 

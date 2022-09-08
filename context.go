@@ -57,6 +57,8 @@ func (c *Context) Text(fmt string, arg ...any) { c.Render(render.Text{Format: fm
 func (c *Context) Data(data render.Data)       { c.Render(data) }
 func (c *Context) Reader(data render.Reader)   { c.Render(data) }
 
+func (c *Context) Param(key string) string { val, _ := c.params.Get(key); return val }
+
 func (c *Context) Bind(data any) error         { return _Bind{}.Bind(c, data) }
 func (c *Context) BindAll(data any) error      { return _BindAll{}.Bind(c, data) }
 func (c *Context) BindForm(data any) error     { return _BindForm{}.Bind(c, data) }

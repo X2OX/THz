@@ -6,7 +6,7 @@ require (
 	github.com/valyala/fasthttp v1.40.0
 	go.uber.org/zap v1.23.0
 	go.x2ox.com/sorbifolia/coarsetime v0.0.0-20220901085912-d53b708be0cc
-	go.x2ox.com/sorbifolia/httprouter v0.0.0-20220827075014-4b441173f628
+	go.x2ox.com/sorbifolia/httprouter v0.0.0-20220908025859-a75399a8322d
 	go.x2ox.com/sorbifolia/jwt v0.0.0-20220831094732-3334656632b3
 	go.x2ox.com/sorbifolia/pyrokinesis v0.0.0-20220827075014-4b441173f628
 	go.x2ox.com/sorbifolia/strong v0.0.0-20220827075014-4b441173f628
