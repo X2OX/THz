@@ -5,6 +5,7 @@ import (
 	"net"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/valyala/fasthttp"
 	"go.uber.org/zap"
@@ -41,6 +42,16 @@ func New() *THz {
 
 	return t
 }
+
+func (thz *THz) SetConcurrency(n int) *THz               { thz.srv.Concurrency = n; return thz }
+func (thz *THz) SetReadBufferSize(n int) *THz            { thz.srv.ReadBufferSize = n; return thz }
+func (thz *THz) SetWriteBufferSize(n int) *THz           { thz.srv.WriteBufferSize = n; return thz }
+func (thz *THz) SetReadTimeout(n time.Duration) *THz     { thz.srv.ReadTimeout = n; return thz }
+func (thz *THz) SetWriteTimeout(n time.Duration) *THz    { thz.srv.WriteTimeout = n; return thz }
+func (thz *THz) SetIdleTimeout(n time.Duration) *THz     { thz.srv.IdleTimeout = n; return thz }
+func (thz *THz) SetKeepalivePeriod(n time.Duration) *THz { thz.srv.TCPKeepalivePeriod = n; return thz }
+func (thz *THz) SetMaxRequestBodySize(n int) *THz        { thz.srv.MaxRequestBodySize = n; return thz }
+func (thz *THz) SetReduceMemoryUsage(n bool) *THz        { thz.srv.ReduceMemoryUsage = n; return thz }
 
 func (thz *THz) SetTrustedProxies(ip ...string) error {
 	arr := make([]*net.IPNet, 0, len(ip))
