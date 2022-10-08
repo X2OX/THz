@@ -14,6 +14,13 @@ func TestListenAndServe(t *testing.T) {
 		t.JSON("hello world")
 	})
 
+	go func() {
+		time.Sleep(5 * time.Second)
+		if err := thz.Stop(); err != nil {
+			fmt.Println(err)
+		}
+	}()
+
 	if err := thz.ListenAndServe(":8080"); err != nil {
 		fmt.Println("start err")
 	}
