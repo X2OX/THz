@@ -28,7 +28,7 @@ func TestRunAndStop(t *testing.T) {
 	})
 
 	go func() {
-		time.Sleep(1 * time.Minute)
+		time.Sleep(5 * time.Second)
 		if err2 := thz.Stop(); err2 != nil {
 			fmt.Println("stop err")
 			fmt.Println(err2)
