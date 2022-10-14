@@ -15,16 +15,17 @@ func TestRecovery(t *testing.T) {
 		panic("test recovery")
 	})
 
+	ch := make(chan int)
 	go func() {
-		time.Sleep(30 * time.Second)
+		<-ch
 		if err := thz.Stop(); err != nil {
 			fmt.Println("error stop")
 		}
 	}()
 
 	go func() {
-		time.Sleep(5 * time.Second)
-		for i := 0; i < 10; i++ {
+		time.Sleep(time.Second)
+		for i := 0; i < 3; i++ {
 			resp, err := http.Get("http://localhost:8081/recovery")
 			if err != nil {
 				fmt.Println("get error", err)
@@ -34,9 +35,9 @@ func TestRecovery(t *testing.T) {
 			if resp != nil {
 				fmt.Println(resp)
 			}
-
-			time.Sleep(time.Second)
 		}
+
+		ch <- 1
 	}()
 
 	if err := thz.ListenAndServe(":8081"); err != nil {
