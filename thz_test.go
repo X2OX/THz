@@ -41,7 +41,7 @@ func TestHandleNotFound(t *testing.T) {
 					t.Error(err)
 				}
 
-				t.Log(fmt.Sprintf("%s--%s", strconv.Itoa(resp.StatusCode), string(buf.Bytes())))
+				t.Logf(fmt.Sprintf("%s--%s", strconv.Itoa(resp.StatusCode), string(buf.Bytes())))
 			}
 		}
 
