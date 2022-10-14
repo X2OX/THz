@@ -3,6 +3,7 @@ package THz
 import (
 	"fmt"
 	"net"
+	"net/http"
 	"strings"
 	"sync"
 	"time"
@@ -109,6 +110,13 @@ func (thz *THz) handle() func(c *fasthttp.RequestCtx) {
 			pyrokinesis.Bytes.ToString(c.URI().Path())
 
 		handlers := thz.route.Find(method, uri, &ctx.params)
+
+		if len(handlers) < 1 {
+			ctx.Abort().Status(http.StatusNotFound)
+			thz.ctxPool.Put(ctx)
+			return
+		}
+
 		for _, v := range handlers {
 			ctx.handlers = append(ctx.handlers, Handler(v))
 		}
