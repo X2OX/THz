@@ -1,7 +1,6 @@
 package recovery
 
 import (
-	"fmt"
 	"go.x2ox.com/THz"
 	"net/http"
 	"testing"
@@ -19,7 +18,7 @@ func TestRecovery(t *testing.T) {
 	go func() {
 		<-ch
 		if err := thz.Stop(); err != nil {
-			fmt.Println("error stop")
+			t.Error(err)
 		}
 	}()
 
@@ -28,12 +27,12 @@ func TestRecovery(t *testing.T) {
 		for i := 0; i < 3; i++ {
 			resp, err := http.Get("http://localhost:8081/recovery")
 			if err != nil {
-				fmt.Println("get error", err)
+				t.Error(err)
 				return
 			}
 
 			if resp != nil {
-				fmt.Println(resp)
+				t.Log(resp)
 			}
 		}
 
@@ -41,6 +40,6 @@ func TestRecovery(t *testing.T) {
 	}()
 
 	if err := thz.ListenAndServe(":8081"); err != nil {
-		fmt.Println("start err")
+		t.Error(err)
 	}
 }
