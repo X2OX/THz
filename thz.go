@@ -20,8 +20,7 @@ type THz struct {
 	route     *httprouter.Router[Context]
 	intercept Handlers
 
-	noRoute    Handlers
-	allNoRoute Handlers
+	noRoute Handlers
 
 	trustedProxies []*net.IPNet
 	trustedHeaders []string
@@ -116,9 +115,8 @@ func (thz *THz) handle() func(c *fasthttp.RequestCtx) {
 			ctx.handlers = append(ctx.handlers, Handler(v))
 		}
 
-		if len(handlers) < 1 {
-			ctx.handlers = thz.allNoRoute
-			thz.rebuild404Handlers()
+		if handlers == nil {
+			ctx.handlers = append(ctx.handlers, thz.noRoute...)
 		}
 
 		ctx.Next()
@@ -133,17 +131,4 @@ func (thz *THz) handle() func(c *fasthttp.RequestCtx) {
 
 func (thz *THz) NoRoute(handlers ...Handler) {
 	thz.noRoute = handlers
-	thz.rebuild404Handlers()
-}
-
-func (thz *THz) rebuild404Handlers() {
-	thz.allNoRoute = thz.combineHandlers(thz.noRoute)
-}
-
-func (thz *THz) combineHandlers(handlers Handlers) Handlers {
-	finalSize := len(thz.intercept) + len(handlers)
-	mergedHandlers := make(Handlers, finalSize)
-	copy(mergedHandlers, thz.intercept)
-	copy(mergedHandlers[len(thz.intercept):], handlers)
-	return mergedHandlers
 }
