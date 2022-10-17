@@ -20,6 +20,8 @@ type THz struct {
 	route     *httprouter.Router[Context]
 	intercept Handlers
 
+	noRoute Handlers
+
 	trustedProxies []*net.IPNet
 	trustedHeaders []string
 	ctxPool        sync.Pool
@@ -113,6 +115,10 @@ func (thz *THz) handle() func(c *fasthttp.RequestCtx) {
 			ctx.handlers = append(ctx.handlers, Handler(v))
 		}
 
+		if handlers == nil {
+			ctx.handlers = append(ctx.handlers, thz.noRoute...)
+		}
+
 		ctx.Next()
 
 		ctx.params = ctx.params[:0]
@@ -121,4 +127,8 @@ func (thz *THz) handle() func(c *fasthttp.RequestCtx) {
 		ctx.keys = nil
 		thz.ctxPool.Put(ctx)
 	}
+}
+
+func (thz *THz) NoRoute(handlers ...Handler) {
+	thz.noRoute = handlers
 }
