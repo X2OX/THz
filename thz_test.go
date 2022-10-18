@@ -5,6 +5,7 @@ import (
 	"go.uber.org/zap/buffer"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"strconv"
 	"sync"
 	"testing"
@@ -73,5 +74,48 @@ func TestNoFound(t *testing.T) {
 
 	if err := thz.ListenAndServe(":8080"); err != nil {
 		t.Error(err)
+	}
+}
+
+func TestMocRequest(t *testing.T) {
+	thz := New()
+
+	thz.NoRoute(func(c *Context) {
+		c.Status(http.StatusNotFound).JSON("404 Not Found")
+	})
+	thz.GET("/", func(c *Context) {
+		c.JSON("hello world")
+	})
+
+	request := httptest.NewRequest("GET", "/", nil)
+	resp, err := thz.TestRequest(request)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if resp != nil && resp.StatusCode != http.StatusOK {
+		var buf buffer.Buffer
+		if _, err = io.Copy(&buf, resp.Body); err != nil {
+			t.Error(err)
+		}
+
+		t.Logf(fmt.Sprintf("%s--%s", strconv.Itoa(resp.StatusCode), string(buf.Bytes())))
+		t.Error("There are some errors")
+	}
+
+	noRouteRequest := httptest.NewRequest("GET", "/tt", nil)
+	resp, err = thz.TestRequest(noRouteRequest)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if resp != nil && resp.StatusCode != http.StatusNotFound {
+		var buf buffer.Buffer
+		if _, err = io.Copy(&buf, resp.Body); err != nil {
+			t.Error(err)
+		}
+
+		t.Logf(fmt.Sprintf("%s--%s", strconv.Itoa(resp.StatusCode), string(buf.Bytes())))
+		t.Error("There are some errors")
 	}
 }
