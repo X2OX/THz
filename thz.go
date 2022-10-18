@@ -1,8 +1,13 @@
 package THz
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
 	"net"
+	"net/http"
+	"net/http/httputil"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -131,4 +136,61 @@ func (thz *THz) handle() func(c *fasthttp.RequestCtx) {
 
 func (thz *THz) NoRoute(handlers ...Handler) {
 	thz.noRoute = handlers
+}
+
+func (thz *THz) TestRequest(req *http.Request, msTimeout ...int) (resp *http.Response, err error) {
+	timeout := 1000
+	if len(msTimeout) > 0 {
+		timeout = msTimeout[0]
+	}
+
+	if req.Body != http.NoBody && req.Header.Get("Content-Length") == "" {
+		req.Header.Add("Content-Length", strconv.FormatInt(req.ContentLength, 10))
+	}
+
+	dump, err := httputil.DumpRequest(req, true)
+	if err != nil {
+		return nil, err
+	}
+
+	dumps := bytes.Split(dump, []byte(" "))
+	dumps[1] = []byte(req.URL.String())
+	dump = bytes.Join(dumps, []byte(" "))
+
+	conn := new(testConn)
+
+	if _, err = conn.r.Write(dump); err != nil {
+		return nil, err
+	}
+
+	channel := make(chan error)
+	go func() {
+		var returned bool
+		defer func() {
+			if !returned {
+				channel <- fmt.Errorf("runtime.Goexit() called in handler or server panic")
+			}
+		}()
+
+		channel <- thz.srv.ServeConn(conn)
+		returned = true
+	}()
+
+	if timeout >= 0 {
+		select {
+		case err = <-channel:
+		case <-time.After(time.Duration(timeout) * time.Millisecond):
+			return nil, fmt.Errorf("test: timeout error %vms", timeout)
+		}
+	} else {
+		err = <-channel
+	}
+
+	if err != nil && err != fasthttp.ErrGetOnly {
+		return nil, err
+	}
+
+	buffer := bufio.NewReader(&conn.w)
+
+	return http.ReadResponse(buffer, req)
 }
