@@ -21,9 +21,11 @@ func New[T any](j *jwt.JWT[T], abort bool, abortFunc func(ctx *thz.Context), sto
 	if g.abort && g.abortFunc == nil {
 		g.abortFunc = func(c *thz.Context) { c.Status(401).Abort() }
 	}
+
 	if g.store && g.storeKey == "" {
 		g.storeKey = "JWT"
 	}
+
 	return g
 }
 
@@ -36,9 +38,11 @@ func (g *Auth[T]) Middleware() thz.Handler {
 			}
 			return
 		}
+
 		if g.store {
 			c.Set(g.storeKey, claims.Data)
 		}
+
 		c.Next()
 	}
 }
