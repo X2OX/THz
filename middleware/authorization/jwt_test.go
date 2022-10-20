@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/valyala/fasthttp"
 	"go.x2ox.com/THz"
 	"go.x2ox.com/sorbifolia/jwt"
 )
@@ -25,6 +24,7 @@ func newJWT() {
 	if err != nil {
 		panic(err)
 	}
+
 	priKey := ed25519.PrivateKey(bts)
 	_jwt := jwt.New(jwt.EdDSA, priKey, priKey.Public(), jwt.Claims[A]{})
 	g := New(_jwt, true,
@@ -34,12 +34,8 @@ func newJWT() {
 		true, "user",
 	)
 
-	fr := &fasthttp.Request{Header: fasthttp.RequestHeader{}}
-	fr.Header.Set("Authorization", "Bearer "+_jwt.MustGenerate(
-		*jwt.NewClaims(&A{User: "k"}).SetExpiresAt(time.Now().Add(time.Hour * 6)),
-	))
-
-	c, e := g.Parse(fr)
+	t := "Bearer " + _jwt.MustGenerate(*jwt.NewClaims(&A{User: "K"}).SetExpiresAt(time.Now().Add(time.Hour * 6)))
+	c, e := g.Parse([]byte(t))
 	fmt.Println(e)
 	fmt.Println(c.Data)
 }
