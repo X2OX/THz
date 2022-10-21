@@ -104,7 +104,6 @@ func (thz *THz) handle() func(c *fasthttp.RequestCtx) {
 		ctx := thz.ctxPool.Get().(*Context)
 		ctx.fc = c
 		ctx.index = -1
-		ctx.handlers = append(ctx.handlers, thz.intercept...)
 		ctx.keys = make(map[any]any)
 
 		method, uri := httprouter.NewMethod(pyrokinesis.Bytes.ToString(c.Method())),
