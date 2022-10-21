@@ -37,7 +37,7 @@ func New() *THz {
 		route:   r,
 	}
 	t.ctxPool = sync.Pool{New: func() any {
-		return &Context{thz: t, index: -1, handlers: t.intercept}
+		return &Context{thz: t, index: -1}
 	}}
 
 	t.srv.Handler = t.handle()
@@ -104,6 +104,7 @@ func (thz *THz) handle() func(c *fasthttp.RequestCtx) {
 		ctx := thz.ctxPool.Get().(*Context)
 		ctx.fc = c
 		ctx.index = -1
+		ctx.handlers = append(ctx.handlers, thz.intercept...)
 		ctx.keys = make(map[any]any)
 
 		method, uri := httprouter.NewMethod(pyrokinesis.Bytes.ToString(c.Method())),
