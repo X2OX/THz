@@ -132,3 +132,7 @@ func (thz *THz) handle() func(c *fasthttp.RequestCtx) {
 func (thz *THz) NoRoute(handlers ...Handler) {
 	thz.noRoute = handlers
 }
+
+func (thz *THz) TestHandler(c *fasthttp.RequestCtx) {
+	thz.srv.Handler(c)
+}

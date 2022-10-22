@@ -19,7 +19,7 @@ const (
 	headerOrigin = "Origin"
 )
 
-func New(allowOrigin ...string) *Config { return &Config{AllowOrigins: allowOrigin} }
+func New(allowOrigin ...string) *Config { return &Config{AllowOrigins: normalize(allowOrigin)} }
 
 // Config
 //
@@ -60,6 +60,12 @@ func (cfg *Config) Middleware() THz.Handler {
 		if cfg.Skip != nil && cfg.Skip(c) {
 			return
 		}
+		if cfg.AllowCredentials {
+			c.SetHeader(headerAllowCredentials, allowCredentials)
+		}
+		if exposeHeaders != "" {
+			c.SetHeader(headerExposeHeaders, exposeHeaders)
+		}
 
 		origin := "*"
 		if allowOrigins != "*" {
@@ -87,16 +93,30 @@ func (cfg *Config) Middleware() THz.Handler {
 		c.SetHeader(headerAllowOrigin, origin)
 		c.SetHeader(headerAllowMethods, allowMethods)
 		c.SetHeader(headerAllowHeaders, allowHeaders)
-		if cfg.AllowCredentials {
-			c.SetHeader(headerAllowCredentials, allowCredentials)
-		}
 		if cfg.MaxAge != 0 {
 			c.SetHeader(headerMaxAge, maxAge)
-		}
-		if exposeHeaders != "" {
-			c.SetHeader(headerExposeHeaders, exposeHeaders)
 		}
 
 		c.Status(204).Abort()
 	}
+}
+
+// normalize is used to format input
+func normalize(values []string) []string {
+	if values == nil {
+		return nil
+	}
+
+	distinct := make(map[string]bool, len(values))
+	normalized := make([]string, 0, len(values))
+
+	for _, value := range values {
+		value = strings.ToLower(strings.TrimSpace(value))
+		if _, ok := distinct[value]; !ok {
+			normalized = append(normalized, value)
+			distinct[value] = true
+		}
+	}
+
+	return normalized
 }
