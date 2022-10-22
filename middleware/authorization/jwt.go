@@ -31,7 +31,7 @@ func New[T any](j *jwt.JWT[T], abort bool, abortFunc func(ctx *thz.Context), sto
 
 func (g *Auth[T]) Middleware() thz.Handler {
 	return func(c *thz.Context) {
-		claims, err := g.Parse(c.PeekAuthorization())
+		claims, err := g.Parse(c.Header("Authorization"))
 		if err != nil {
 			if g.abort {
 				g.abortFunc(c)

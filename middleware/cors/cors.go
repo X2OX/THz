@@ -64,7 +64,7 @@ func (cfg *Config) Middleware() THz.Handler {
 		origin := "*"
 		if allowOrigins != "*" {
 			has := false
-			origin = pyrokinesis.Bytes.ToString(c.PeekHeader(headerOrigin))
+			origin = pyrokinesis.Bytes.ToString(c.Header(headerOrigin))
 			for _, v := range cfg.AllowOrigins {
 				if v == origin {
 					has = true
@@ -77,7 +77,7 @@ func (cfg *Config) Middleware() THz.Handler {
 			}
 		}
 
-		if !c.RequestMethodIsOptions() {
+		if !c.IsOptions() {
 			c.SetHeader(headerAllowOrigin, origin)
 			return // is not CORS request
 		}
