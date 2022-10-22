@@ -50,10 +50,10 @@ func TestCORSDefault(t *testing.T) {
 
 func TestAllowOrigins(t *testing.T) {
 	thz := THz.New()
-	thz.AddIntercept(New("1.1.1.1", "192.168.1.1").Middleware())
+	thz.AddIntercept(New("http:", "https:").Middleware())
 
 	ctx := &fasthttp.RequestCtx{}
-	ctx.Request.Header.Set(headerOrigin, "10.10.1.1")
+	ctx.Request.Header.Set(headerOrigin, "chrome-extension://")
 	ctx.Request.Header.SetMethod("GET")
 
 	thz.TestHandler(ctx)
@@ -63,7 +63,7 @@ func TestAllowOrigins(t *testing.T) {
 	}
 
 	ctx = &fasthttp.RequestCtx{}
-	ctx.Request.Header.Set(headerOrigin, "1.1.1.1")
+	ctx.Request.Header.Set(headerOrigin, "http:")
 	ctx.Request.Header.SetMethod("OPTIONS")
 
 	thz.TestHandler(ctx)
