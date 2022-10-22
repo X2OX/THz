@@ -13,8 +13,7 @@ func TestCORSDefault(t *testing.T) {
 	ctx := &fasthttp.RequestCtx{}
 	ctx.Request.Header.SetMethod("GET")
 
-	handler := thz.TestHandler()
-	handler(ctx)
+	thz.TestHandler(ctx)
 
 	if string(ctx.Response.Header.Peek(headerAllowOrigin)) != "*" {
 		t.Error(string(ctx.Response.Header.Peek(headerAllowOrigin)))
@@ -30,7 +29,7 @@ func TestCORSDefault(t *testing.T) {
 
 	ctx = &fasthttp.RequestCtx{}
 	ctx.Request.Header.SetMethod("OPTIONS")
-	handler(ctx)
+	thz.TestHandler(ctx)
 
 	if string(ctx.Response.Header.Peek("Vary")) != "Origin,Access-Control-Allow-Headers,Access-Control-Allow-Methods" {
 		t.Error(string(ctx.Response.Header.Peek("Vary")))
@@ -57,8 +56,7 @@ func TestAllowOrigins(t *testing.T) {
 	ctx.Request.Header.Set(headerOrigin, "10.10.1.1")
 	ctx.Request.Header.SetMethod("GET")
 
-	handler := thz.TestHandler()
-	handler(ctx)
+	thz.TestHandler(ctx)
 
 	if string(ctx.Response.Header.Peek("Vary")) != "Origin" {
 		t.Error(string(ctx.Response.Header.Peek("Vary")))
@@ -68,7 +66,7 @@ func TestAllowOrigins(t *testing.T) {
 	ctx.Request.Header.Set(headerOrigin, "1.1.1.1")
 	ctx.Request.Header.SetMethod("OPTIONS")
 
-	handler(ctx)
+	thz.TestHandler(ctx)
 
 	if string(ctx.Response.Header.Peek("Vary")) != "Origin,Access-Control-Allow-Headers,Access-Control-Allow-Methods" {
 		t.Error(string(ctx.Response.Header.Peek("Vary")))
