@@ -36,9 +36,15 @@ func (c *Context) Next() {
 	}
 }
 
-func (c *Context) Request() *fasthttp.Request   { return &c.fc.Request }
-func (c *Context) Response() *fasthttp.Response { return &c.fc.Response }
+func (c *Context) IsOptions() bool { return c.fc.Request.Header.IsOptions() }
+func (c *Context) IsGet() bool     { return c.fc.Request.Header.IsGet() }
+func (c *Context) IsPost() bool    { return c.fc.Request.Header.IsPost() }
+func (c *Context) IsHead() bool    { return c.fc.Request.Header.IsHead() }
+func (c *Context) IsPut() bool     { return c.fc.Request.Header.IsPut() }
+func (c *Context) IsDelete() bool  { return c.fc.Request.Header.IsDelete() }
+func (c *Context) IsPatch() bool   { return c.fc.Request.Header.IsPatch() }
 
+func (c *Context) Header(s string) []byte           { return c.fc.Request.Header.Peek(s) }
 func (c *Context) SetHeader(k, v string) *Context   { c.fc.Response.Header.Set(k, v); return c }
 func (c *Context) SetLocation(v string) *Context    { return c.SetHeader("Location", v) }
 func (c *Context) SetContentType(v string) *Context { return c.SetHeader("Content-Type", v) }
