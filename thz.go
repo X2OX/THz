@@ -37,7 +37,7 @@ func New() *THz {
 		route:   r,
 	}
 	t.ctxPool = sync.Pool{New: func() any {
-		return &Context{thz: t, index: -1, handlers: t.intercept}
+		return &Context{thz: t, index: -1}
 	}}
 
 	t.srv.Handler = t.handle()
