@@ -60,6 +60,12 @@ func (cfg *Config) Middleware() THz.Handler {
 		if cfg.Skip != nil && cfg.Skip(c) {
 			return
 		}
+		if cfg.AllowCredentials {
+			c.SetHeader(headerAllowCredentials, allowCredentials)
+		}
+		if exposeHeaders != "" {
+			c.SetHeader(headerExposeHeaders, exposeHeaders)
+		}
 
 		origin := "*"
 		if allowOrigins != "*" {
@@ -87,14 +93,8 @@ func (cfg *Config) Middleware() THz.Handler {
 		c.SetHeader(headerAllowOrigin, origin)
 		c.SetHeader(headerAllowMethods, allowMethods)
 		c.SetHeader(headerAllowHeaders, allowHeaders)
-		if cfg.AllowCredentials {
-			c.SetHeader(headerAllowCredentials, allowCredentials)
-		}
 		if cfg.MaxAge != 0 {
 			c.SetHeader(headerMaxAge, maxAge)
-		}
-		if exposeHeaders != "" {
-			c.SetHeader(headerExposeHeaders, exposeHeaders)
 		}
 
 		c.Status(204).Abort()
