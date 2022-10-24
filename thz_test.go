@@ -1,14 +1,9 @@
 package THz
 
 import (
-	"fmt"
-	"go.uber.org/zap/buffer"
-	"io"
+	"github.com/valyala/fasthttp"
 	"net/http"
-	"strconv"
-	"sync"
 	"testing"
-	"time"
 )
 
 func TestNoFound(t *testing.T) {
@@ -22,56 +17,24 @@ func TestNoFound(t *testing.T) {
 		c.JSON("hello world")
 	})
 
-	var wg sync.WaitGroup
-	wg.Add(2)
+	uri := fasthttp.AcquireURI()
+	uri.SetPath("/test")
 
-	go func() {
-		wg.Wait()
-		if err := thz.Stop(); err != nil {
-			t.Error(err)
-		}
-	}()
+	var ctx fasthttp.RequestCtx
+	ctx.Request.Header.SetMethod("GET")
+	ctx.Request.SetURI(uri)
 
-	go func() {
-		time.Sleep(time.Second)
-		for i := 0; i < 10; i++ {
-			resp, err := http.Get("http://localhost:8080/test")
-			if err != nil {
-				t.Error(err)
-			}
+	thz.TestHandler(&ctx)
 
-			if resp != nil && resp.StatusCode != http.StatusOK {
-				var buf buffer.Buffer
-				if _, err = io.Copy(&buf, resp.Body); err != nil {
-					t.Error(err)
-				}
+	if ctx.Response.StatusCode() != 200 {
+		t.Error("exist route is error")
+	}
 
-				t.Logf(fmt.Sprintf("%s--%s", strconv.Itoa(resp.StatusCode), string(buf.Bytes())))
-				t.Error("There are some errors")
-			}
-		}
+	uri.SetPath("/noRoute")
+	ctx.Request.SetURI(uri)
+	thz.TestHandler(&ctx)
 
-		wg.Done()
-	}()
-
-	go func() {
-		time.Sleep(time.Second)
-		for i := 0; i < 10; i++ {
-			resp, err := http.Get("http://localhost:8080/te")
-			if err != nil {
-				t.Error(err)
-			}
-
-			if resp != nil && resp.StatusCode != http.StatusNotFound {
-				t.Log(resp.StatusCode)
-				t.Error("There are some errors")
-			}
-		}
-
-		wg.Done()
-	}()
-
-	if err := thz.ListenAndServe(":8080"); err != nil {
-		t.Error(err)
+	if ctx.Response.StatusCode() != 404 {
+		t.Error("noRoute is error")
 	}
 }
