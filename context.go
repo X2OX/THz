@@ -44,8 +44,9 @@ func (c *Context) IsPut() bool     { return c.fc.Request.Header.IsPut() }
 func (c *Context) IsDelete() bool  { return c.fc.Request.Header.IsDelete() }
 func (c *Context) IsPatch() bool   { return c.fc.Request.Header.IsPatch() }
 
-func (c *Context) Method() []byte { return c.fc.Request.Header.Method() }
-func (c *Context) Path() []byte   { return c.fc.Request.URI().Path() }
+func (c *Context) Method() []byte    { return c.fc.Request.Header.Method() }
+func (c *Context) Path() []byte      { return c.fc.Request.URI().Path() }
+func (c *Context) GetHeader() []byte { return c.fc.Request.Header.Header() }
 
 func (c *Context) Header(s string) []byte           { return c.fc.Request.Header.Peek(s) }
 func (c *Context) SetHeader(k, v string) *Context   { c.fc.Response.Header.Set(k, v); return c }
