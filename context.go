@@ -1,6 +1,7 @@
 package THz
 
 import (
+	"mime/multipart"
 	"sync"
 	"time"
 
@@ -75,6 +76,8 @@ func (c *Context) BindURLQuery(data any) error { return _BindURLQuery{}.Bind(c, 
 
 func (c *Context) RemoteIP() string    { return c.getRemoteIPs(false)[0] }
 func (c *Context) RemoteIPs() []string { return c.getRemoteIPs(false) }
+
+func (c *Context) FormFile(name string) (*multipart.FileHeader, error) { return c.fc.FormFile(name) }
 
 func (c *Context) Deadline() (deadline time.Time, ok bool) {
 	if c == nil || c.fc == nil {
