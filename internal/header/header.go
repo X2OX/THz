@@ -1,6 +1,7 @@
 package header
 
 import (
+	"encoding/json"
 	"errors"
 	"reflect"
 	"strconv"
@@ -105,8 +106,12 @@ func setValue(v reflect.Value, data string) error {
 			v.Set(reflect.New(v.Type().Elem()))
 		}
 		return setValue(v.Elem(), data)
-	// case reflect.Array: // TODO support
-	// case reflect.Slice:
+	case reflect.Array:
+		return json.Unmarshal([]byte(data), v.Addr().Interface())
+	case reflect.Slice:
+		return json.Unmarshal([]byte(data), v.Addr().Interface())
+	case reflect.Map:
+		return json.Unmarshal([]byte(data), v.Addr().Interface())
 	case reflect.String:
 		v.SetString(data)
 	case reflect.Struct:
