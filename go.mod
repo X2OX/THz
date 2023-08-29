@@ -3,7 +3,7 @@ module go.x2ox.com/THz
 go 1.19
 
 require (
-	github.com/valyala/fasthttp v1.47.0
+	github.com/valyala/fasthttp v1.49.0
 	go.uber.org/zap v1.24.0
 	go.x2ox.com/sorbifolia/coarsetime v0.0.0-20220901085912-d53b708be0cc
 	go.x2ox.com/sorbifolia/httprouter v0.0.0-20221024044717-18b76330e578
