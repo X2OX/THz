@@ -39,7 +39,7 @@ func (cfg *Config) Middleware() THz.Handler {
 		allowOrigins     = "*"
 		allowMethods     = "GET,POST,HEAD,PUT,DELETE,PATCH"
 		allowHeaders     = "Origin,Content-Length,Content-Type,Authorization"
-		allowCredentials = "ture"
+		allowCredentials = "true"
 		exposeHeaders    = ""
 	)
 	if len(cfg.AllowOrigins) != 0 {
@@ -99,6 +99,31 @@ func (cfg *Config) Middleware() THz.Handler {
 
 		c.Status(204).Abort()
 	}
+}
+
+func (cfg *Config) WithCredential() *Config {
+	cfg.AllowCredentials = true
+	return cfg
+}
+
+func (cfg *Config) SetMaxAge(age int) *Config {
+	cfg.MaxAge = age
+	return cfg
+}
+
+func (cfg *Config) SetMethod(method ...string) *Config {
+	cfg.AllowMethods = method
+	return cfg
+}
+
+func (cfg *Config) SetAllowHeader(header ...string) *Config {
+	cfg.AllowHeaders = header
+	return cfg
+}
+
+func (cfg *Config) SetExposeHeader(header ...string) *Config {
+	cfg.ExposeHeaders = header
+	return cfg
 }
 
 // normalize is used to format input
