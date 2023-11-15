@@ -3,7 +3,7 @@ module go.x2ox.com/THz
 go 1.19
 
 require (
-	github.com/valyala/fasthttp v1.50.0
+	github.com/valyala/fasthttp v1.51.0
 	go.uber.org/zap v1.26.0
 	go.x2ox.com/sorbifolia/coarsetime v0.0.0-20220901085912-d53b708be0cc
 	go.x2ox.com/sorbifolia/httprouter v0.0.0-20221024044717-18b76330e578
@@ -15,7 +15,7 @@ require (
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
-	github.com/klauspost/compress v1.16.3 // indirect
+	github.com/klauspost/compress v1.17.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 )
